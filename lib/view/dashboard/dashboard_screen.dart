@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:tech_media/res/color.dart';
 import 'package:tech_media/view/dashboard/profile/profile_screen.dart';
 import 'package:tech_media/view/dashboard/user/user_screen.dart';
+
+import 'Home/HomeScreen.dart';
 
 class DashBoardScreen extends StatefulWidget {
   const DashBoardScreen({Key? key}) : super(key: key);
@@ -17,40 +20,33 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
 
   List<Widget>  _screens(){
     return [
-      Center(child: Text('data')),
-      Center(child: Text('data')),
-      Center(child: Text('data')),
-      AllUserScreen(),
-      ProfileScreen()
+      HomeScreen(),
+      const Center(child: Text('data')),
+      const AllUserScreen(),
+      const ProfileScreen()
     ];
   }
    List<PersistentBottomNavBarItem> _navbarItem(){
     return [
       PersistentBottomNavBarItem(
-        icon: Icon(Icons.home,),
-        activeColorPrimary: AppColors.primaryIconColor,
-        inactiveIcon: Icon(Icons.home, color: Colors.grey.shade100)
+        icon: const FaIcon(FontAwesomeIcons.userPlus,size: 22),
+        activeColorPrimary: AppColors.secondaryTealColors,
+        inactiveIcon: FaIcon(FontAwesomeIcons.userPlus, size: 20,color: Colors.grey.shade100)
       ),
       PersistentBottomNavBarItem(
-          icon: Icon(Icons.sms,),
-          activeColorPrimary:AppColors.primaryIconColor,
-          inactiveIcon: Icon(Icons.sms_rounded, color: Colors.grey.shade100)
+          icon: const FaIcon(FontAwesomeIcons.solidCommentDots,),
+          activeColorPrimary:AppColors.secondaryTealColors,
+          inactiveIcon: FaIcon(FontAwesomeIcons.solidCommentDots, color: Colors.grey.shade100)
       ),
       PersistentBottomNavBarItem(
-          icon: Icon(Icons.add,),
-          activeColorPrimary:AppColors.hintColor,
-          inactiveIcon: Icon(Icons.add, color: AppColors.whiteColor),
-        activeColorSecondary: AppColors.primaryIconColor
+          icon: const FaIcon(FontAwesomeIcons.userFriends,size: 22),
+          activeColorPrimary:AppColors.secondaryTealColors,
+          inactiveIcon: FaIcon(FontAwesomeIcons.userFriends,size: 20, color: Colors.grey.shade100)
       ),
       PersistentBottomNavBarItem(
-          icon: Icon(Icons.add_box,),
-          activeColorPrimary:AppColors.primaryIconColor,
-          inactiveIcon: Icon(Icons.add_box, color: Colors.grey.shade100)
-      ),
-      PersistentBottomNavBarItem(
-          icon: Icon(Icons.person,),
-          activeColorPrimary:AppColors.primaryIconColor,
-          inactiveIcon: Icon(Icons.person, color: Colors.grey.shade100)
+          icon: const FaIcon(FontAwesomeIcons.gear,),
+          activeColorPrimary:AppColors.secondaryTealColors,
+          inactiveIcon: FaIcon(FontAwesomeIcons.gear, color: Colors.grey.shade100)
       ),
     ];
    }
@@ -62,13 +58,15 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         context,
         screens: _screens(),
         items: _navbarItem(),
-      backgroundColor: AppColors.otpHintColor,
+      padding: const NavBarPadding.only(top: 20,bottom: 8),
+      backgroundColor: AppColors.dividedColor,
       controller: controller,
-      navBarStyle: NavBarStyle.style15,
+      navBarStyle: NavBarStyle.style14,
       decoration: NavBarDecoration(
-        borderRadius: BorderRadius.circular(1)
+        borderRadius: BorderRadius.circular(12),
       ),
       stateManagement: true,
+      navBarHeight: 70,
     );
   }
 }

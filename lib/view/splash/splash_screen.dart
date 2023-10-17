@@ -1,14 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:tech_media/ViewModel/services/SplashServices.dart';
-import 'package:tech_media/res/fonts.dart';
-
-import '../../res/color.dart';
-
-
+import '../../ViewModel/Autheticate.dart';
+import '../../ViewModel/services/SplashServices.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -16,31 +13,38 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
 
-  SplashServices services = SplashServices();
+
+  // SplashServices services = SplashServices();
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-    services.isLogin(context);
+    // services.isLogin(context);
+    Timer(
+        Duration(seconds: 3),
+            () => Navigator.push(context, MaterialPageRoute(builder: (context) => Authenticate(),)));
   }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: SafeArea(
-          child:Column(
+        body: SizedBox(
+          width: double.infinity,
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-             Image(image: AssetImage('assets/images/logo.jpg')),
-              const Padding(
-                padding:  EdgeInsets.symmetric(vertical: 20),
-                child: Center(child: Text('Tech Brothers Media' , style: TextStyle(fontFamily: AppFonts.sfProDisplayBold , fontSize: 40, fontWeight: FontWeight.w700),)),
-              )
+              Image.asset('assets/images/chat_icon.png'),
+              const Text(
+                'Bego Chat',
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 40.0,
+                    color: Colors.black87),
+              ),
+              const CircularProgressIndicator()
             ],
-          )
-      ),
-    );
+          ),
+        ));
   }
 }

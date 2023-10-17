@@ -9,6 +9,7 @@ class AppColors {
 
   static const Color primaryTextTextColor =  Color(0xff242424);
   static const Color secondaryTextColor =  Color(0xff8F92A1);
+  static const Color secondaryTealColors =  Color(0xffEFACA5);
 
   static const Color primaryIconColor =  Color(0xff242424);
 

@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:tech_media/ViewModel/services/session_manager.dart';
 import 'package:tech_media/utils/routes/route_name.dart';
 
+import '../Autheticate.dart';
+
 class SplashServices {
   void isLogin(BuildContext context) {
     final auth = FirebaseAuth.instance;
@@ -18,7 +20,7 @@ class SplashServices {
     } else {
       Timer(
           Duration(seconds: 3),
-              () => Navigator.pushNamed(context, RouteName.loginView));
+              () => Navigator.push(context, MaterialPageRoute(builder: (context) => Authenticate(),)));
     }
   }
 }

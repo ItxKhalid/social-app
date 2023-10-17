@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -81,10 +82,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 Image.file(
                                                   fit: BoxFit.cover,
                                                     File(provider.image!.path)),
-                                                Center(
-                                                  child:
-                                                      CircularProgressIndicator(),
-                                                )
+
                                               ],
                                             )),
                                 ),
@@ -143,7 +141,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           SizedBox(height: 20),
                           RoundButton(
                               btntxt: 'Logout',
-                              ontap: () {
+                              ontap: ()async {
+                                final auth = FirebaseAuth.instance;
+                                await auth.signOut();
                                 PersistentNavBarNavigator.pushNewScreen(context, screen: LoginScreen(),
                                 withNavBar: false
                                 );

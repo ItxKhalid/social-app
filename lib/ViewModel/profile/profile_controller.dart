@@ -98,11 +98,11 @@ class ProfileController with ChangeNotifier {
     reference
         .child(SessionController().userId.toString())
         .update({'profile': newUrl.toString()}).then((value) {
-      Utils().toastMassage('Profile Updated');
+      Utils().toastMassage('Profile Updated',false);
       setLoading(false);
       // _image = null;
     }).onError((error, stackTrace) {
-      Utils().toastMassage(error.toString());
+      Utils().toastMassage(error.toString(),true);
       setLoading(false);
     });
   }

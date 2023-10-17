@@ -15,13 +15,13 @@ class Routes {
       case RouteName.splashScreen:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
       case RouteName.loginView:
-        return MaterialPageRoute(builder: (_) =>  LoginScreen());
+        return MaterialPageRoute(builder: (_) =>  const LoginScreen());
       case RouteName.signupView:
-        return MaterialPageRoute(builder: (_) =>  SignUpScreen());
+        return MaterialPageRoute(builder: (_) =>   SignUpView());
       case RouteName.dashboardView:
-        return MaterialPageRoute(builder: (_) =>  DashBoardScreen());
+        return MaterialPageRoute(builder: (_) =>  const DashBoardScreen());
         case RouteName.forgotpassword:
-        return MaterialPageRoute(builder: (_) =>  ForgotPasswordScreen());
+        return MaterialPageRoute(builder: (_) =>  const ForgotPasswordScreen());
 
       default:
         return MaterialPageRoute(builder: (_) {

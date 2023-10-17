@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class _AllUserScreenState extends State<AllUserScreen> {
   DatabaseReference databaseReference =
       FirebaseDatabase.instance.ref().child('user');
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,11 +30,13 @@ class _AllUserScreenState extends State<AllUserScreen> {
           centerTitle: true,
           actions: [
             IconButton(
-                onPressed: () {
+                onPressed: () async {
+                  final auth = FirebaseAuth.instance;
+                  await auth.signOut();
                   PersistentNavBarNavigator.pushNewScreen(context,
-                      screen: LoginScreen(), withNavBar: false);
+                      screen: const LoginScreen(), withNavBar: false);
                 },
-                icon: Icon(Icons.logout))
+                icon: const Icon(Icons.logout))
           ],
         ),
         body: FirebaseAnimatedList(
@@ -47,11 +51,31 @@ class _AllUserScreenState extends State<AllUserScreen> {
                 child: ListTile(
                   onTap: () {
                     PersistentNavBarNavigator.pushNewScreen(context,
-                        screen: MessageGroupingWithTimeStamp(
+                        screen:
+                        MassageScreen(
                           name: snapshot.child('username').value.toString(),
-                          email: snapshot.child('email').value.toString(),
-                          image: snapshot.child('profile').value.toString(),
-                        ),
+                          image: snapshot.child('email').value.toString(),
+                          email: snapshot.child('profile').value.toString(),
+                          receiverId: snapshot.child('uid').value.toString(),
+                        ) ,
+                        // {
+                        //                       // Navigate to the MessageGroupingWithTimeStamp screen when a user is tapped
+                        //                       PersistentNavBarNavigator.pushNewScreen(
+                        //                         context,
+                        //                         screen: MessageGroupingWithTimeStamp(
+                        //                           name: snapshot.child('username').value.toString(),
+                        //                           email: snapshot.child('email').value.toString(),
+                        //                           image: snapshot.child('profile').value.toString(),
+                        //                           receiverId: snapshot.child('uid').value.toString(),
+                        //                         ),
+                        //                         withNavBar: false,
+                        //                       );
+                        //                     }
+                        // MessageGroupingWithTimeStamp(
+                        //   name: snapshot.child('username').value.toString(),
+                        //   email: snapshot.child('email').value.toString(),
+                        //   image: snapshot.child('profile').value.toString(),
+                        // ),
                       withNavBar: false
                     );
                   },
@@ -63,7 +87,7 @@ class _AllUserScreenState extends State<AllUserScreen> {
                         border:
                             Border.all(color: AppColors.primaryTextTextColor)),
                     child: snapshot.child('profile').value.toString() == ''
-                        ? Icon(Icons.person_outline)
+                        ? const Icon(Icons.person_outline)
                         : ClipRRect(
                             borderRadius: BorderRadius.circular(50),
                             child: Image(

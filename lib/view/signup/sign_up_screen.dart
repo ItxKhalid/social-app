@@ -1,164 +1,231 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:tech_media/ViewModel/signup/signup_controller.dart';
+import 'package:get/get.dart';
+import 'package:tech_media/view/login/login_screen.dart';
 
-import '../../res/color.dart';
-import '../../utils/routes/route_name.dart';
-import '../../widgets/RoundButton.dart';
-import '../../widgets/TextFormFeild.dart';
+import '../../ViewModel/Methods.dart';
+import '../../utils/utils.dart';
 
-class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({Key? key}) : super(key: key);
-
+class SignUpView extends StatefulWidget {
   @override
-  State<SignUpScreen> createState() => _SignUpScreenState();
+  _SignUpViewState createState() => _SignUpViewState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController userNameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  FocusNode emailFocus = FocusNode();
-  FocusNode passwordFocus = FocusNode();
-  FocusNode userNameFocus = FocusNode();
+class _SignUpViewState extends State<SignUpView> {
+  final TextEditingController _name = TextEditingController();
+  final TextEditingController _email = TextEditingController();
+  final TextEditingController _password = TextEditingController();
+  bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
 
-  @override
-  void dispose() {
-    super.dispose();
-    emailController.dispose();
-    passwordController.dispose();
-    userNameController.dispose();
-    passwordFocus.dispose();
-    emailFocus.dispose();
-    userNameFocus.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height * 1;
-    return SafeArea(
+    final size = MediaQuery.of(context).size;
+
+    return Container(
+      decoration: const BoxDecoration(
+        image: DecorationImage(
+            image: AssetImage('assets/images/register.png'), fit: BoxFit.cover),
+      ),
       child: Scaffold(
-          appBar: AppBar(
-            elevation: 0,
+        backgroundColor: Colors.transparent,
+        body: isLoading
+            ? Center(
+          child: Container(
+            height: size.height / 20,
+            width: size.height / 20,
+            child: const CircularProgressIndicator(),
           ),
-          body: ChangeNotifierProvider(
-            create: (_) => SignUpController(),
-            child: Consumer<SignUpController>(
-              builder: (context, provider, child) {
-                return SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(height: height * .03),
-                        Text('WelCome to The App',
-                            style: Theme.of(context).textTheme.headline3),
-                        SizedBox(height: height * .01),
-                        Text('Create your account to connected peoples',
-                            style: Theme.of(context).textTheme.subtitle2),
-                        SizedBox(height: height * .12),
-                        Form(
-                            key: _formKey,
-                            child: Column(
-                              children: [
-                                TextFormFieldWidget(
-                                    myController: userNameController,
-                                    myFocusNode: userNameFocus,
-                                    onFieldSubmitted: (value) {},
-                                    formFieldValidator: (value) {
-                                      return value.isEmpty
-                                          ? 'Enter Username'
-                                          : null;
-                                    },
-                                    prefixIcon:
-                                        const Icon(Icons.person_outline),
-                                    keyboardType: TextInputType.emailAddress,
-                                    hint: 'Username',
-                                    enable: true,
-                                    obscureText: false),
-                                SizedBox(height: height * .03),
-                                TextFormFieldWidget(
-                                    myController: emailController,
-                                    myFocusNode: emailFocus,
-                                    prefixIcon:
-                                        const Icon(Icons.email_outlined),
-                                    onFieldSubmitted: (value) {},
-                                    formFieldValidator: (value) {
-                                      return value.isEmpty
-                                          ? 'EnterEmail'
-                                          : null;
-                                    },
-                                    keyboardType: TextInputType.emailAddress,
-                                    hint: 'Email',
-                                    enable: true,
-                                    obscureText: false),
-                                SizedBox(height: height * .03),
-                                TextFormFieldWidget(
-                                    myController: passwordController,
-                                    myFocusNode: passwordFocus,
-                                    prefixIcon:
-                                        const Icon(Icons.lock_outline_rounded),
-                                    onFieldSubmitted: (value) {},
-                                    formFieldValidator: (value) {
-                                      return value.isEmpty
-                                          ? 'Enter Password'
-                                          : null;
-                                    },
-                                    keyboardType: TextInputType.emailAddress,
-                                    hint: 'Password',
-                                    enable: true,
-                                    obscureText: true),
-                              ],
-                            )),
-                        SizedBox(height: height * .03),
-                        RoundButton(
-                          btntxt: 'Sign Up',
-                          loading: provider.loading,
-                          ontap: () {
-                            if (_formKey.currentState!.validate()) {
-                              provider.signUp(
-                                  context,
-                                  userNameController.text.toString(),
-                                  emailController.text.toString(),
-                                  passwordController.text.toString());
-                            }
-                          },
-                        ),
-                        SizedBox(height: height * .04),
-                        InkWell(
-                          onTap: () {
-                            Navigator.pushNamed(context, RouteName.loginView);
-                          },
-                          child: Text.rich(TextSpan(
-                              text: 'Already have account ? ',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .headline5!
-                                  .copyWith(
-                                      fontSize: 15,
-                                      color: AppColors.lightGrayColor),
-                              children: [
-                                TextSpan(
-                                  text: 'Log In',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .subtitle2!
-                                      .copyWith(
-                                          fontSize: 15,
-                                          decoration: TextDecoration.underline),
-                                )
-                              ])),
-                        ),
-                      ],
+        )
+            : SingleChildScrollView(
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                SizedBox(
+                  height: size.height / 20,
+                ),
+                Container(
+                  alignment: Alignment.centerLeft,
+                  width: size.width / 0.5,
+                  child: IconButton(
+                      icon: const Icon(Icons.arrow_back_ios), onPressed: () {}),
+                ),
+                SizedBox(
+                  height: size.height / 50,
+                ),
+                Container(
+                  width: size.width / 1.1,
+                  child: const Text(
+                    "Welcome",
+                    style: TextStyle(
+                      fontSize: 34,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                );
-              },
+                ),
+                Container(
+                  width: size.width / 1.1,
+                  child: const Text(
+                    "Create Account to Contiue!",
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: size.height / 15,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 18.0),
+                  child: Container(
+                    width: size.width,
+                    alignment: Alignment.center,
+                    child: field(size, "Name", Icons.person_2_rounded, _name),
+                  ),
+                ),
+                Container(
+                  width: size.width,
+                  alignment: Alignment.center,
+                  child: field(size, "email", Icons.alternate_email_outlined, _email),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 18.0),
+                  child: Container(
+                    width: size.width,
+                    alignment: Alignment.center,
+                    child: field(size, "password", Icons.lock_rounded, _password),
+                  ),
+                ),
+                SizedBox(
+                  height: size.height / 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Sign Up',
+                        style: TextStyle(
+                          color: Color(0xff4c505b),
+                          fontSize: 27,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      customButton(size),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 40,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            Get.back();
+                          },
+                          child: const Text(
+                            'Login',
+                            style: TextStyle(
+                              decoration: TextDecoration.underline,
+                              fontSize: 18,
+                              color: Color(0xff4c505b),
+                            ),
+                          ),
+                        ),
+                      ]),
+                ),
+              ],
             ),
-          )),
+          ),
+        ),
+      ),
     );
+  }
+
+  Widget customButton(Size size) {
+    return GestureDetector(
+      onTap: () async {
+        if (_formKey.currentState!.validate()) {
+          // _submit();
+        }
+        var userName = _name.text.trim();
+        var userEmail = _email.text.trim();
+        var userPassword = _password.text.trim();
+        await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(
+            email: userEmail, password: userPassword)
+            .then((value) => {
+          signUpUser(userName,userEmail, context),
+        });
+      },
+      child: const CircleAvatar(
+        radius: 30,
+        backgroundColor: Color(0xff4c505b),
+        child: Icon(Icons.arrow_forward),
+      ),
+    );
+  }
+
+  Widget field(
+      Size size, String hintText, IconData icon, TextEditingController cont) {
+    return Container(
+      height: size.height / 14,
+      width: size.width / 1.1,
+      child: TextField(
+        controller: cont,
+        style: const TextStyle(color: Colors.white),
+        decoration: InputDecoration(
+            prefixIcon: Icon(icon),
+            hintText: hintText,
+            hintStyle: const TextStyle(color: Colors. black26),
+            enabledBorder:  OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: Colors.white)
+            ),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: Colors.teal)
+            )
+        ),
+      ),
+    );
+  }
+}
+
+
+signUpUser(String userName, String userEmail,
+    BuildContext context) async {
+  User? userId = FirebaseAuth.instance.currentUser;
+
+  try {
+    await FirebaseFirestore.instance.collection("users").doc(userId?.uid).set({
+      "name": userName,
+      "email": userEmail,
+      "status": "Unavalible",
+      "uid": userId?.uid,
+
+    }).then((value) {
+      print("Success");
+      // FirebaseAuth.instance.signOut();
+      print(userId!.uid);
+      Utils().toastMassage('User Created Successfully', true);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const LoginScreen(),
+          ));
+    });
+  } catch (e) {
+    print("Error $e");
   }
 }

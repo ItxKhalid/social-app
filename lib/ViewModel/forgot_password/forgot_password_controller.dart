@@ -24,14 +24,14 @@ class ForgotPasswordController with ChangeNotifier {
           .sendPasswordResetEmail(email: email,)
           .then((value) {
         Navigator.pushNamed(context, RouteName.loginView);
-        Utils().toastMassage('Please check your email');
+        Utils().toastMassage('Please check your email',false);
         setLoading(false);
       }).onError((error, stackTrace) {
-        Utils().toastMassage(error.toString());
+        Utils().toastMassage(error.toString(),true);
         setLoading(false);
       });
     } catch (e) {
-      Utils().toastMassage(e.toString());
+      Utils().toastMassage(e.toString(),true);
       setLoading(false);
     }
   }

@@ -1,36 +1,26 @@
 {
   "project_info": {
-    "project_number": "956477397714",
-    "project_id": "social-app-cf99c",
-    "storage_bucket": "social-app-cf99c.appspot.com"
+    "project_number": "664142391856",
+    "project_id": "chatapp-ed106",
+    "storage_bucket": "chatapp-ed106.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:956477397714:android:5182c6ab674f13313b6b0b",
+        "mobilesdk_app_id": "1:664142391856:android:86f04f22d736d92da29bf5",
         "android_client_info": {
           "package_name": "com.example.tech_media"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "956477397714-4trh7tu3fo76l5pc9hdq2fla7nk744ot.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAXZI6HDCEKsZVghg143M2205lW9vBfAew"
+          "current_key": "AIzaSyD6uQ3r4erSWGgbHXBzYOzxQcucTrwAcRM"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "956477397714-4trh7tu3fo76l5pc9hdq2fla7nk744ot.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

@@ -10,14 +10,14 @@ class Utils{
     FocusScope.of(context).requestFocus(nextFocus);
   }
 
-  void toastMassage(String massage){
+  void toastMassage(String massage,bool onError){
     Fluttertoast.showToast(
         msg: massage,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.TOP,
         timeInSecForIosWeb: 3,
-        backgroundColor: Colors.tealAccent,
-        textColor: Colors.black,
+        backgroundColor: onError==false ? Colors.tealAccent : const Color(0xffEA9890),
+        textColor: onError==false ? Colors.black : Colors.white,
         fontSize: 16.0
     );
   }
