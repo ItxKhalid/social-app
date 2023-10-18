@@ -48,7 +48,7 @@ class TextFormFieldWidget extends StatelessWidget {
               borderSide: BorderSide(style: BorderStyle.solid)),
           focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(style: BorderStyle.solid,color: AppColors.inputTextBorderColor)),
+              borderSide: BorderSide(style: BorderStyle.solid,color: AppColors.iconBackgroundColor)),
           errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide(style: BorderStyle.solid,color: AppColors.alertColor))

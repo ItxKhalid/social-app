@@ -103,6 +103,9 @@ flutter:
     - family:  SF-Pro-Display-Medium
       fonts:
         - asset: assets/fonts/SF-Pro-Display-Medium.otf
+    - family:  TiltNeon-Regular
+      fonts:
+        - asset: assets/fonts/TiltNeon-Regular.ttf
 
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

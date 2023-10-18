@@ -121,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         children: [
                           InkWell(
                             onTap: () {
-                              Get.to(() =>  SignUpView());
+                              Get.to(() => SignUpView());
                             },
                             child: const Text(
                               'Sign Up',
@@ -151,15 +151,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
           logIn(_email.text, _password.text).then((user) {
             if (user != null) {
-              Utils().toastMassage('LogIn Successfully',false);
+              Utils().toastMassage('LogIn Successfully', false);
               print("Login Sucessfull");
               setState(() {
                 isLoading = false;
               });
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (_) => const DashBoardScreen()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const DashBoardScreen()));
             } else {
-              Utils().toastMassage('LogIn Failed',true);
+              Utils().toastMassage('LogIn Failed', true);
               print("Login Failed");
               setState(() {
                 isLoading = false;
@@ -167,14 +167,16 @@ class _LoginScreenState extends State<LoginScreen> {
             }
           });
         } else {
-          Utils().toastMassage('Please fill form correctly',true);
+          Utils().toastMassage('Please fill form correctly', true);
           print("Please fill form correctly");
         }
       },
-      child:  CircleAvatar(
+      child: CircleAvatar(
         radius: 30,
         backgroundColor: const Color(0xff4c505b),
-        child: isLoading  ? const CircularProgressIndicator() :const Icon(Icons.arrow_forward),
+        child: isLoading
+            ? const CircularProgressIndicator()
+            : const Icon(Icons.arrow_forward, color: Colors.white),
       ),
     );
   }

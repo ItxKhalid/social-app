@@ -4,7 +4,7 @@ import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:tech_media/res/color.dart';
 import 'package:tech_media/view/dashboard/profile/profile_screen.dart';
 import 'package:tech_media/view/dashboard/user/user_screen.dart';
-
+import '../group_chats/group_chat_screen.dart';
 import 'Home/HomeScreen.dart';
 
 class DashBoardScreen extends StatefulWidget {
@@ -18,11 +18,12 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
 
   final controller = PersistentTabController(initialIndex: 0);
 
+  /// List of screens
   List<Widget>  _screens(){
     return [
       HomeScreen(),
       const Center(child: Text('data')),
-      const AllUserScreen(),
+      const GroupChatHomeScreen(),
       const ProfileScreen()
     ];
   }

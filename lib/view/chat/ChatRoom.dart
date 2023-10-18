@@ -100,6 +100,8 @@ class ChatRoom extends StatelessWidget {
   }
 
   final ScrollController _scrollController = ScrollController();
+  bool scrollbool = false;
+  double itemHeight = 50.0;
 
   @override
   Widget build(BuildContext context) {
@@ -108,7 +110,7 @@ class ChatRoom extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         image: DecorationImage(
-            image: AssetImage('assets/images/register.png'), fit: BoxFit.cover),
+            image: AssetImage('assets/images/peakpx.jpg'), fit: BoxFit.cover),
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -129,8 +131,7 @@ class ChatRoom extends StatelessWidget {
                   child: Column(
                     children: [
                       Text(userMap['name'],style: const TextStyle(color: Colors.white)),
-                      Text(
-                        snapshot.data!['status'],
+                      Text(snapshot.data!['status'],
                         style: const TextStyle(fontSize: 14,color: Colors.white38),
                       ),
                     ],
@@ -158,10 +159,42 @@ class ChatRoom extends StatelessWidget {
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (snapshot.data != null) {
+                      if (_scrollController.hasClients) {
+                        double maxScrollExtent =
+                            _scrollController
+                                .position.maxScrollExtent;
+                        double offset =
+                            _scrollController.offset;
+                        double reversedOffset =
+                            maxScrollExtent - offset;
+                        int bottomItemIndex =
+                        (reversedOffset / itemHeight)
+                            .floor();
+
+                        // print("----------------------current index          ${bottomItemIndex}--------------------------");
+                        if (bottomItemIndex > 2) {
+                          scrollbool = false;
+                        } else {
+                          scrollbool = true;
+                        }
+                      }
+
+                      if (snapshot.data!.docs.length > 3 &&
+                          scrollbool == true) {
+                        WidgetsBinding.instance
+                            .addPostFrameCallback((_) {
+                          if (_scrollController.hasClients) {
+                            _scrollController.jumpTo(
+                                _scrollController
+                                    .position.maxScrollExtent);
+                          }
+                        });
+                        scrollbool = false;
+                      }
                       return ListView.builder(
                         controller: _scrollController,
                         shrinkWrap: true,
-                        physics: const BouncingScrollPhysics(),
+                        physics: const ClampingScrollPhysics(),
                         itemCount: snapshot.data!.docs.length,
                         itemBuilder: (context, index) {
                           Map<String, dynamic> map = snapshot.data!.docs[index]
@@ -225,6 +258,7 @@ class ChatRoom extends StatelessWidget {
                 left:
                     map['sendby'] == _auth.currentUser!.displayName ? 100 : 10),
             child: CustomPaint(
+              // size: const Size.fromWidth(50),
               painter: MessageBubble(
                   color: map['sendby'] == _auth.currentUser!.displayName
                       ? Color(0xffDAF0F3)
@@ -307,7 +341,7 @@ class ShowImage extends StatelessWidget {
         height: size.height,
         width: size.width,
         color: Colors.black,
-        child: Image.network(imageUrl),
+        child: Image.network(imageUrl,fit: BoxFit.fill),
       ),
     );
   }

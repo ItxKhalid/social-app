@@ -36,11 +36,11 @@ class _SplashScreenState extends State<SplashScreen> {
             children: [
               Image.asset('assets/images/chat_icon.png'),
               const Text(
-                'Bego Chat',
+                'BBF Chat App',
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 40.0,
-                    color: Colors.black87),
+                    color: Colors.white38),
               ),
               const CircularProgressIndicator()
             ],

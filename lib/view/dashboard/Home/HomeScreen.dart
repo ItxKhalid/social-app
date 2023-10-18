@@ -1,11 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
-import 'package:provider/provider.dart';
-import 'package:tech_media/ViewModel/login/login_controller.dart';
 
 import '../../../ViewModel/Methods.dart';
+import '../../../res/color.dart';
 import '../../chat/ChatRoom.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -44,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
+  ///set RoomId for one to one chat
   String chatRoomId(String user1, String user2) {
     if (user1[0].toLowerCase().codeUnits[0] >
         user2.toLowerCase().codeUnits[0]) {
@@ -53,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
+  /// Search data in firestorm
   void onSearch() async {
     FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
@@ -62,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
     await _firestore
         .collection('users')
-        .where("email", isEqualTo: _search.text)
+        .where("number", isEqualTo: _search.text)
         .get()
         .then((value) {
       setState(() {
@@ -78,92 +80,122 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
+      backgroundColor: AppColors.dividedColor,
       appBar: AppBar(
-        title: const Text("Search for friends"),
+        backgroundColor: AppColors.dividedColor,
+        title: const Text("Search for friends",
+            style: TextStyle(color: Colors.white38)),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
-              icon: const Icon(Icons.logout),
+              icon: const Icon(Icons.logout, color: Colors.white38),
               onPressed: () => logOut(context))
         ],
       ),
       body: isLoading
           ? Center(
-        child: SizedBox(
-          height: size.height / 20,
-          width: size.height / 20,
-          child: const CircularProgressIndicator(),
-        ),
-      )
+              child: SizedBox(
+                height: size.height / 20,
+                width: size.height / 20,
+                child: const CircularProgressIndicator(),
+              ),
+            )
           : Column(
-        children: [
-          SizedBox(
-            height: size.height / 20,
-          ),
-          Container(
-            height: size.height / 14,
-            width: size.width,
-            alignment: Alignment.center,
-            child: Container(
-              height: size.height / 14,
-              width: size.width / 1.15,
-              child: TextField(
-                controller: _search,
-                decoration: InputDecoration(
-                  hintText: "Search",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+              children: [
+                SizedBox(
+                  height: size.height / 40,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                  child: Row(
+                    children: [
+                      /// Form
+                      Expanded(
+                        child: TextField(
+                          controller: _search,
+                          keyboardType: TextInputType.number,
+                          style: const TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
+                            hintText: "Search phone number",
+                            hintStyle: const TextStyle(color: Colors.white38),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide:
+                                    const BorderSide(color: Colors.white)),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        onTap: onSearch,
+                        child: Container(
+                          height: 62,
+                          width: 60,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.white38)),
+                          child: const Center(
+                              child: FaIcon(FontAwesomeIcons.search,
+                                  color: Colors.white38)),
+                        ),
+                      )
+                    ],
                   ),
                 ),
-              ),
+                SizedBox(
+                  height: size.height / 30,
+                ),
+                userMap != null
+                    ? Card(
+                        elevation: 2,
+                        color: Colors.white24,
+                        margin: const EdgeInsets.symmetric(horizontal: 15),
+                        child: ListTile(
+                          onTap: () {
+                            String roomId = chatRoomId(
+                                _auth.currentUser!.displayName!,
+                                userMap!['name']);
+                            PersistentNavBarNavigator.pushNewScreen(context,
+                                screen: ChatRoom(
+                                  chatRoomId: roomId,
+                                  userMap: userMap!,
+                                ),
+                                withNavBar: false);
+                          },
+                          leading: const CircleAvatar(
+                              child: Icon(
+                            Icons.person_rounded,
+                            size: 40,
+                          )
+                          ),
+                          title: Text(
+                            userMap!['name'],
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 17,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          subtitle: Text(userMap!['number'],
+                              style: const TextStyle(color: Colors.white38)),
+                          trailing: const Icon(Icons.chat,color: Colors.white38),
+                        ),
+                      )
+                    : Container(),
+              ],
             ),
-          ),
-          SizedBox(
-            height: size.height / 50,
-          ),
-          ElevatedButton(
-            onPressed: onSearch,
-            child: const Text("Search"),
-          ),
-          SizedBox(
-            height: size.height / 30,
-          ),
-          userMap != null
-              ? ListTile(
-            onTap: () {
-              String roomId = chatRoomId(
-                  _auth.currentUser!.displayName!,
-                  userMap!['name']);
-
-             PersistentNavBarNavigator.pushNewScreen(context, screen: ChatRoom(
-               chatRoomId: roomId,
-               userMap: userMap!,
-             ),withNavBar: false);
-            },
-            leading: const Icon(Icons.account_box, color: Colors.black),
-            title: Text(
-              userMap!['name'],
-              style: const TextStyle(
-                color: Colors.black,
-                fontSize: 17,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            subtitle: Text(userMap!['email']),
-            trailing: const Icon(Icons.chat, color: Colors.black),
-          )
-              : Container(),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.group),onPressed: (){},
-        // onPressed: () => Navigator.of(context).push(
-        //   MaterialPageRoute(
-        //     builder: (_) => GroupChatHomeScreen(),
-        //   ),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   child: const Icon(Icons.group),
+      //   onPressed: () =>  PersistentNavBarNavigator.pushNewScreen(context, screen: const GroupChatHomeScreen(),withNavBar: false)
+      //   //     Navigator.of(context).push(
+      //   //   MaterialPageRoute(
+      //   //     builder: (_) => const GroupChatHomeScreen(),
+      //   //   ),
+      //   // )
+      // ),
     );
   }
 }
-
-
