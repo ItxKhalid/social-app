@@ -4,6 +4,7 @@ import 'package:persistent_bottom_nav_bar/persistent_tab_view.dart';
 import 'package:tech_media/res/color.dart';
 import 'package:tech_media/view/dashboard/profile/profile_screen.dart';
 import 'package:tech_media/view/dashboard/user/user_screen.dart';
+import '../chat/chatScreen.dart';
 import '../group_chats/group_chat_screen.dart';
 import 'Home/HomeScreen.dart';
 
@@ -22,18 +23,13 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   List<Widget>  _screens(){
     return [
       HomeScreen(),
-      const Center(child: Text('data')),
       const GroupChatHomeScreen(),
       const ProfileScreen()
     ];
   }
    List<PersistentBottomNavBarItem> _navbarItem(){
     return [
-      PersistentBottomNavBarItem(
-        icon: const FaIcon(FontAwesomeIcons.userPlus,size: 22),
-        activeColorPrimary: AppColors.secondaryTealColors,
-        inactiveIcon: FaIcon(FontAwesomeIcons.userPlus, size: 20,color: Colors.grey.shade100)
-      ),
+
       PersistentBottomNavBarItem(
           icon: const FaIcon(FontAwesomeIcons.solidCommentDots,),
           activeColorPrimary:AppColors.secondaryTealColors,

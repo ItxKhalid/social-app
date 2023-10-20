@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -8,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../res/color.dart';
 import '../chat/ChatRoom.dart';
 import '../dashboard/massage/massage2.dart';
 import 'group_info.dart';
@@ -98,6 +98,10 @@ class GroupChatRoom extends StatelessWidget {
     }
   }
 
+  final ScrollController _scrollController = ScrollController();
+  bool scrollbool = false;
+  double itemHeight = 50.0;
+
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -135,11 +139,39 @@ class GroupChatRoom extends StatelessWidget {
                       .collection('groups')
                       .doc(groupChatId)
                       .collection('chats')
-                      .orderBy('time')
+                      .orderBy('time', descending: true)
                       .snapshots(),
                   builder: (context, snapshot) {
-                    if (snapshot.hasData) {
+                    if (snapshot.data != null) {
+                      if (_scrollController.hasClients) {
+                        double maxScrollExtent =
+                            _scrollController.position.maxScrollExtent;
+                        double offset = _scrollController.offset;
+                        double reversedOffset = maxScrollExtent - offset;
+                        int bottomItemIndex =
+                            (reversedOffset / itemHeight).ceil();
+
+                        // print("----------------------current index          ${bottomItemIndex}--------------------------");
+                        if (bottomItemIndex > 2) {
+                          scrollbool = false;
+                        } else {
+                          scrollbool = true;
+                        }
+                      }
+
+                      if (snapshot.data!.docs.length > 3 &&
+                          scrollbool == true) {
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (_scrollController.hasClients) {
+                            _scrollController.jumpTo(
+                                _scrollController.position.maxScrollExtent);
+                          }
+                        });
+                        scrollbool = false;
+                      }
                       return ListView.builder(
+                        reverse: true,
+                        shrinkWrap: true,
                         itemCount: snapshot.data!.docs.length,
                         itemBuilder: (context, index) {
                           Map<String, dynamic> chatMap =
@@ -165,25 +197,56 @@ class GroupChatRoom extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        height: size.height / 17,
-                        width: size.width / 1.3,
-                        child: TextField(
-                          controller: _message,
-                          decoration: InputDecoration(
-                              suffixIcon: IconButton(
-                                onPressed: () {},
-                                icon: const Icon(Icons.photo),
-                              ),
-                              hintText: "Send Message",
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              )),
+                      Expanded(
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: AppColors.dividedColor,
+                              borderRadius: BorderRadius.circular(12)),
+                          child: TextFormField(
+                            controller: _message,
+                            maxLines: 3,
+                            style: const TextStyle(
+                                color: AppColors.lightGrayColor),
+                            decoration: InputDecoration(
+                                fillColor: AppColors.dividedColor,
+                                suffixIcon: IconButton(
+                                  onPressed: () => getImage(),
+                                  icon: const Icon(Icons.photo,
+                                      color: AppColors.lightGrayColor),
+                                ),
+                                hintText: "Send Message",
+                                hintStyle: const TextStyle(
+                                    color: AppColors.lightGrayColor),
+                                focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                        style: BorderStyle.solid,
+                                        color: AppColors.iconBackgroundColor)),
+                                enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    borderSide: BorderSide(
+                                        style: BorderStyle.solid,
+                                        color: AppColors.lightGrayColor)),
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.white),
+                                  borderRadius: BorderRadius.circular(12),
+                                )),
+                          ),
                         ),
                       ),
-                      IconButton(
-                          icon: const Icon(Icons.send),
-                          onPressed: onSendMessage),
+                      const SizedBox(width: 10),
+                      Container(
+                        height: 63,
+                        width: 60,
+                        decoration: BoxDecoration(
+                            color: AppColors.dividedColor,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.white70)),
+                        child: IconButton(
+                            icon: const Icon(Icons.send,
+                                color: AppColors.lightGrayColor),
+                            onPressed: onSendMessage),
+                      ),
                     ],
                   ),
                 ),
@@ -201,8 +264,8 @@ class GroupChatRoom extends StatelessWidget {
         return Container(
           width: size.width,
           alignment: chatMap['sendBy'] == _auth.currentUser!.displayName
-              ? Alignment.centerRight
-              : Alignment.centerLeft,
+              ? Alignment.topRight
+              : Alignment.topLeft,
           child: Padding(
             padding: EdgeInsets.only(
                 left: chatMap['sendBy'] == _auth.currentUser!.displayName
@@ -217,71 +280,111 @@ class GroupChatRoom extends StatelessWidget {
               // size: const Size.fromWidth(50),
               painter: MessageBubble(
                   color: chatMap['sendBy'] == _auth.currentUser!.displayName
-                      ? Color(0xffDAF0F3)
-                      : Color(0xffC795B2),
-                  alignment: chatMap['sendBy'] == _auth.currentUser!.displayName
-                      ? Alignment.topRight
-                      : Alignment.topLeft,
+                      ? const Color(0xffDAF0F3)
+                      : const Color(0xffC795B2),
+                  alignment: chatMap['sendBy'] != _auth.currentUser!.displayName
+                      ? Alignment.topLeft
+                      : Alignment.topRight,
                   tail: true),
               child: Padding(
-                padding: EdgeInsets.only(
-                    left: chatMap['sendBy'] == _auth.currentUser!.displayName
-                        ? 15
-                        : 8,
-                    right: 15,
-                    top: 10,
-                    bottom: 10),
-                child: Text(
-                  chatMap['message'].toString(),
-                  textAlign: TextAlign.left,
-                  style: TextStyle(
-                      fontSize: 15,
-                      color: chatMap['sendby'] == _auth.currentUser!.displayName
-                          ? Colors.white
-                          : Colors.black),
+                padding: const EdgeInsets.only(top: 10, bottom: 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding:  EdgeInsets.only(left: chatMap['sendBy'] != _auth.currentUser!.displayName ? 15 :6, right: 20),
+                      child: Text(
+                        chatMap['sendBy'].toString(),
+                        style: TextStyle(
+                            fontSize: 11,
+                            color: chatMap['sendBy'] !=
+                                    _auth.currentUser!.displayName
+                                ? Colors.white70
+                                : Colors.teal),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                        left:
+                            chatMap['sendby'] == _auth.currentUser!.displayName
+                                ? 20
+                                : 20,
+                        right:
+                            chatMap['sendby'] == _auth.currentUser!.displayName
+                                ? 15
+                                : 20,
+                      ),
+                      child: Text(
+                        chatMap['message'].toString(),
+                        style: TextStyle(
+                            fontSize: 15,
+                            color: chatMap['sendBy'] !=
+                                    _auth.currentUser!.displayName
+                                ? Colors.white
+                                : Colors.black),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
         );
       } else if (chatMap['type'] == "img") {
-        return Container(
-          width: size.width,
-          alignment: chatMap['sendBy'] == _auth.currentUser!.displayName
-              ? Alignment.centerRight
-              : Alignment.centerLeft,
-          child: Container(
-            height: size.height / 2.5,
-            width: size.width,
-            padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-            alignment: chatMap['sendBy'] == _auth.currentUser!.displayName
-                ? Alignment.centerRight
-                : Alignment.centerLeft,
-            child: InkWell(
-              onTap: () => Get.to(
-                ShowImage(
-                  imageUrl: chatMap['message'],
-                ),
+        return Column(
+          crossAxisAlignment: chatMap['sendby'] != _auth.currentUser!.displayName ? CrossAxisAlignment.start :CrossAxisAlignment.end,
+          children: [
+            Padding(
+              padding:  EdgeInsets.only(top: 10,left: chatMap['sendBy'] != _auth.currentUser!.displayName ? 15 :6, right: 20),
+              child: Text(
+                '${chatMap['sendby'].toString()}',
+                style: TextStyle(
+                    fontSize: 16,
+                    color: chatMap['sendBy'] !=
+                        _auth.currentUser!.displayName
+                        ? Colors.white70
+                        : Colors.teal),
               ),
-              child: Container(
-                height: size.height / 2.5,
-                width: size.width / 2,
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black45),
-                    borderRadius: BorderRadius.circular(15)),
-                alignment: chatMap['message'] != "" ? null : Alignment.center,
-                child: chatMap['message'] != ""
-                    ? ClipRRect(
+            ),
+            Container(
+              height: size.height / 2.5,
+              width: size.width,
+              padding: EdgeInsets.only(
+                top: 5,
+                bottom: 5,
+                left:
+                    chatMap['sendby'] == _auth.currentUser!.displayName ? 150 : 10,
+                right:
+                    chatMap['sendby'] == _auth.currentUser!.displayName ? 10 : 150,
+              ),
+              child: InkWell(
+                onTap: () => Get.to(
+                  ShowImage(
+                    imageUrl: chatMap['message'],
+                  ),
+                ),
+                child: Container(
+                  height: size.height / 2.5,
+                  width: size.width / 2,
+                  decoration: BoxDecoration(
+                    color: Colors.white38,
+                      border: Border.all(color: Colors.black45),
+                      borderRadius: BorderRadius.circular(15)),
+                  // alignment: chatMap['message'] != "" ? null : Alignment.center,
+                  child: chatMap['message'] != ""
+                      ? ClipRRect(
                         borderRadius: BorderRadius.circular(15),
                         child: Image.network(
                           chatMap['message'],
                           fit: BoxFit.cover,
                         ),
                       )
-                    : const CircularProgressIndicator(),
+                      : Center(child: const CircularProgressIndicator()),
+                ),
               ),
             ),
-          ),
+          ],
         );
       } else if (chatMap['type'] == "notify") {
         return Container(

@@ -65,6 +65,7 @@ class _GroupChatHomeScreenState extends State<GroupChatHomeScreen> {
                 )
               : ListView.builder(
                   itemCount: groupList.length,
+                  padding: const EdgeInsets.only(top:20),
                   itemBuilder: (context, index) {
                     return Card(
                       elevation: 2,

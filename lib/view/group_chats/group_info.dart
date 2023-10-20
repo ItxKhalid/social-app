@@ -1,12 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:tech_media/res/color.dart';
 
 import '../dashboard/Home/HomeScreen.dart';
 import 'add_members.dart';
 
 class GroupInfo extends StatefulWidget {
   final String groupId, groupName;
+
   const GroupInfo({required this.groupId, required this.groupName, Key? key})
       : super(key: key);
 
@@ -84,7 +87,8 @@ class _GroupInfoState extends State<GroupInfo> {
             builder: (context) {
               return AlertDialog(
                 content: ListTile(
-                  onTap: () => removeMembers(index),
+                  onTap: () => removeMembers(index)
+                      .then((value) => Navigator.pop(context)),
                   title: const Text("Remove This Member"),
                 ),
               );
@@ -129,6 +133,14 @@ class _GroupInfoState extends State<GroupInfo> {
 
     return SafeArea(
       child: Scaffold(
+        backgroundColor: AppColors.dividedColor,
+        appBar: AppBar(
+          leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white38),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
+        ),
         body: isLoading
             ? Container(
                 height: size.height,
@@ -140,10 +152,6 @@ class _GroupInfoState extends State<GroupInfo> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: BackButton(),
-                    ),
                     Container(
                       height: size.height / 8,
                       width: size.width / 1.1,
@@ -171,6 +179,7 @@ class _GroupInfoState extends State<GroupInfo> {
                                 widget.groupName,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
+                                  color: Colors.white70,
                                   fontSize: size.width / 16,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -180,18 +189,15 @@ class _GroupInfoState extends State<GroupInfo> {
                         ],
                       ),
                     ),
-
-                    //
-
                     SizedBox(
                       height: size.height / 20,
                     ),
-
                     Container(
                       width: size.width / 1.1,
                       child: Text(
                         "${membersList.length} Members",
                         style: TextStyle(
+                          color: Colors.white38,
                           fontSize: size.width / 20,
                           fontWeight: FontWeight.w500,
                         ),
@@ -215,12 +221,14 @@ class _GroupInfoState extends State<GroupInfo> {
                                 ),
                               ),
                             ),
-                            leading: const Icon(
-                              Icons.add,
+                            leading: const FaIcon(
+                              FontAwesomeIcons.add,
+                              color: Colors.white70,
                             ),
                             title: Text(
                               "Add Members",
                               style: TextStyle(
+                                color: Colors.white38,
                                 fontSize: size.width / 22,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -234,19 +242,38 @@ class _GroupInfoState extends State<GroupInfo> {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemBuilder: (context, index) {
-                          return ListTile(
-                            onTap: () => showDialogBox(index),
-                            leading: const Icon(Icons.account_circle),
-                            title: Text(
-                              membersList[index]['name'],
-                              style: TextStyle(
-                                fontSize: size.width / 22,
-                                fontWeight: FontWeight.w500,
+                          return Card(
+                            elevation: 2,
+                            color: Colors.white24,
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 15, vertical: 10),
+                            child: ListTile(
+                              onTap: () => showDialogBox(index),
+                              leading: const CircleAvatar(
+                                  child: Icon(Icons.account_circle)),
+                              title: Text(
+                                membersList[index]['name'],
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: size.width / 22,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
+                              subtitle: Text(membersList[index]['number'],
+                                  style: TextStyle(
+                                    color: Colors.white38,
+                                    fontSize: size.width / 28,
+                                    fontWeight: FontWeight.w500,
+                                  )),
+                              trailing: Text(
+                                  membersList[index]['isAdmin'] == true
+                                      ? "Admin"
+                                      : "member",style: TextStyle(
+                                color: Colors.white38,
+                                fontSize: size.width / 33,
+                                fontWeight: FontWeight.w500,
+                              )),
                             ),
-                            subtitle: Text(membersList[index]['email']),
-                            trailing: Text(
-                                membersList[index]['isAdmin'] ? "Admin" : ""),
                           );
                         },
                       ),

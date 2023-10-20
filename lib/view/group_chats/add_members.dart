@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:tech_media/utils/utils.dart';
 
 class AddMembersINGroup extends StatefulWidget {
   final String groupChatId, name;
@@ -36,7 +38,7 @@ class _AddMembersINGroupState extends State<AddMembersINGroup> {
 
     await _firestore
         .collection('users')
-        .where("email", isEqualTo: _search.text)
+        .where("number", isEqualTo: _search.text)
         .get()
         .then((value) {
       setState(() {
@@ -59,7 +61,10 @@ class _AddMembersINGroupState extends State<AddMembersINGroup> {
         .doc(userMap!['uid'])
         .collection('groups')
         .doc(widget.groupChatId)
-        .set({"name": widget.name, "id": widget.groupChatId});
+        .set({"name": widget.name, "id": widget.groupChatId}).then((value) {
+          Navigator.pop(context);
+          Utils().toastMassage('Member Added successfully', false);
+    });
   }
 
   @override
@@ -68,57 +73,75 @@ class _AddMembersINGroupState extends State<AddMembersINGroup> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add Members"),
+        title: Text("Add Members",style: TextStyle(
+          color: Colors.white70,
+          fontSize: size.width / 18,
+          fontWeight: FontWeight.w500,
+        )),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            SizedBox(
-              height: size.height / 20,
-            ),
-            Container(
-              height: size.height / 14,
-              width: size.width,
-              alignment: Alignment.center,
-              child: Container(
-                height: size.height / 14,
-                width: size.width / 1.15,
-                child: TextField(
-                  controller: _search,
-                  decoration: InputDecoration(
-                    hintText: "Search",
-                    border: OutlineInputBorder(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                height: size.height / 20,
+              ),
+              TextField(
+                controller: _search,
+                keyboardType: TextInputType.number,
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: "Search for friends",
+                  hintStyle: const TextStyle(color: Colors.white38),
+                  focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
-                    ),
+                      borderSide:
+                      const BorderSide(color: Colors.white)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
               ),
-            ),
-            SizedBox(
-              height: size.height / 50,
-            ),
-            isLoading
-                ? Container(
-                    height: size.height / 12,
-                    width: size.height / 12,
-                    alignment: Alignment.center,
-                    child: CircularProgressIndicator(),
+              SizedBox(
+                height: size.height / 50,
+              ),
+              isLoading
+                  ? Container(
+                      height: size.height / 12,
+                      width: size.height / 12,
+                      alignment: Alignment.center,
+                      child: const CircularProgressIndicator(),
+                    )
+                  : ElevatedButton(
+                      onPressed: onSearch,
+                      child: const Text("Search"),
+                    ),
+              userMap != null
+                  ? Card(
+                elevation: 2,
+                color: Colors.white24,
+                margin: const EdgeInsets.symmetric(horizontal: 5,vertical: 20),
+                    child: ListTile(
+                        onTap: onAddMembers,
+                        leading: const CircleAvatar(child: FaIcon(FontAwesomeIcons.person)),
+                        title: Text(userMap!['name'],style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: size.width / 22,
+                          fontWeight: FontWeight.w500,
+                        )),
+                        subtitle: Text(userMap!['number'],style: TextStyle(
+                          color: Colors.white38,
+                          fontSize: size.width / 28,
+                          fontWeight: FontWeight.w500,
+                        )),
+                        trailing: const FaIcon(FontAwesomeIcons.add,color: Colors.white38),
+                      ),
                   )
-                : ElevatedButton(
-                    onPressed: onSearch,
-                    child: Text("Search"),
-                  ),
-            userMap != null
-                ? ListTile(
-                    onTap: onAddMembers,
-                    leading: Icon(Icons.account_box),
-                    title: Text(userMap!['name']),
-                    subtitle: Text(userMap!['email']),
-                    trailing: Icon(Icons.add),
-                  )
-                : SizedBox(),
-          ],
+                  : const SizedBox(),
+            ],
+          ),
         ),
       ),
     );

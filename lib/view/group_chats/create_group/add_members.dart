@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
+import '../../../utils/utils.dart';
 import 'create_group.dart';
 
 class AddMembersInGroup extends StatefulWidget {
@@ -53,13 +55,23 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
         .where("number", isEqualTo: _search.text)
         .get()
         .then((value) {
-      setState(() {
-        userMap = value.docs[0].data();
-        isLoading = false;
-      });
-      print(userMap);
+      if (value.docs.isNotEmpty) {
+        // User found
+        setState(() {
+          userMap = value.docs[0].data();
+          isLoading = false;
+        });
+      } else {
+        // User not found
+        setState(() {
+          userMap = null;
+          isLoading = false;
+        });
+        Utils().toastMassage('User Not found', true);
+      }
     });
   }
+
 
   void onResultTap() {
     bool isAlreadyExist = false;
@@ -114,7 +126,7 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
                   return Card(
                     elevation: 2,
                     color: Colors.white24,
-                    margin: const EdgeInsets.symmetric(horizontal: 15),
+                    margin: const EdgeInsets.symmetric(horizontal: 15,vertical: 10),
                     child: ListTile(
                       onTap: () => onRemoveMembers(index),
                       leading: const CircleAvatar(child: Icon(Icons.account_circle)),
@@ -169,21 +181,28 @@ class _AddMembersInGroupState extends State<AddMembersInGroup> {
                     onPressed: onSearch,
                     child: const Text("Search"),
                   ),
+            const SizedBox(height: 20),
+
             userMap != null
-                ? ListTile(
-                    onTap: onResultTap,
-                    leading: const Icon(Icons.account_box),
-                    title: Text(userMap!['name']),
-                    subtitle: Text(userMap!['email']),
-                    trailing: const Icon(Icons.add),
-                  )
+                ? Card(
+              elevation: 2,
+              color: Colors.white24,
+              margin: const EdgeInsets.symmetric(horizontal: 15),
+                  child: ListTile(
+                      onTap: onResultTap,
+                      leading: const CircleAvatar(child: Icon(Icons.account_circle)),
+                      title: Text(userMap!['name'], style: const TextStyle(color: Colors.white38)),
+                      subtitle: Text(userMap!['number'], style: const TextStyle(color: Colors.white38)),
+                      trailing: const Icon(Icons.add,color: Colors.white38),
+                    ),
+                )
                 : const SizedBox(),
           ],
         ),
       ),
       floatingActionButton: membersList.length >= 2
           ? FloatingActionButton(
-              child: const Icon(Icons.forward),
+              child: const FaIcon(FontAwesomeIcons.add),
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (_) => CreateGroup(

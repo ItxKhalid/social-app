@@ -14,28 +14,6 @@ class _UserChatRoomHomeScreenState extends State<UserChatRoomHomeScreen> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   bool isLoading = true;
 
-  List chatRoomList = [];
-
-  @override
-  void initState() {
-    super.initState();
-    getChatRooms();
-  }
-
-  void getChatRooms() async {
-    String uid = _auth.currentUser!.uid;
-
-    await _firestore
-        .collection('chatroom')
-        .where('users', arrayContains: uid)
-        .get()
-        .then((value) {
-      setState(() {
-        chatRoomList = value.docs;
-        isLoading = false;
-      });
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,34 +25,32 @@ class _UserChatRoomHomeScreenState extends State<UserChatRoomHomeScreen> {
         title: const Text("Chat Rooms", style: TextStyle(color: Colors.white38)),
         automaticallyImplyLeading: false,
       ),
-      body: isLoading
-          ? Center(
-        child: CircularProgressIndicator(),
-      )
-          : Padding(
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: ListView.builder(
-          itemCount: chatRoomList.length,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.only(top: 12.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  color: Colors.white24, // Change to your desired color
-                ),
-                child: ListTile(
-                  onTap: () {
-                    // Handle chat room selection, navigate to chat screen, etc.
-                  },
-                  leading: CircleAvatar(
-                    child: Icon(Icons.person, size: 40), // Change as needed
-                  ),
-                  title: Text(
-                    chatRoomList[index]['name'], // Change to chat room name
-                    style: const TextStyle(color: Colors.white38),
-                  ),
-                ),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: StreamBuilder<QuerySnapshot>(
+          stream: _firestore.collection('users').snapshots(),
+          builder: (context, snapshot) {
+            List<Widget> roomWidget = [];
+            if(snapshot.hasData)
+              {
+                final chatRoom = snapshot.data!.docs.reversed.toList();
+                for(var chatroom in chatRoom)
+                  {
+                    final roomList = Card(
+                      elevation: 2,
+                      color: Colors.white24,
+                      margin: const EdgeInsets.symmetric(horizontal: 15),
+                      child: ListTile(
+                        title: Text(chatroom['name']),
+                        subtitle: Text(chatroom['number']),
+                      ),
+                    );
+                    roomWidget.add(roomList);
+                  }
+              }
+            return Expanded(
+              child: ListView(
+                children: roomWidget,
               ),
             );
           },
